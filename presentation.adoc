@@ -1,0 +1,17 @@
+:icons: font
+:linkattrs:
+:slides: .
+:imagedir: ../images
+:customcss: ../styles/custom.css
+= The Topic
+
+include::{slides}/sandbox.adoc[]
+
+== !
+That's it! +
+Any Questions?
+
+[%notitle]
+== Melting Pot
+image::{imagedir}/bumper.jpg[canvas,size=contain]
+
