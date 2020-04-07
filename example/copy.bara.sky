@@ -1,0 +1,108 @@
+origin_url = "https://github.com/signed/codemods.git"
+excluded_files=[
+                           "readme.md",
+                           "yarn.lock",
+                           "sample/**",
+                           "src/transformers/**",
+                           "src/utils.ts"
+                ]
+origin_files=glob(["**"], exclude = excluded_files)
+destination=git.destination(
+                    url = "file:///tmp/result",
+                    fetch = "master",
+                    push = "master",
+                )
+authoring = authoring.pass_thru("Thomas Heilbronner <thomas.heilbronner@gmail.com>")
+
+def remove_script(file, script_name):
+  return     core.replace(
+                 paths = glob([file]),
+                 before = "${x}",
+                 after = "",
+                 multiline = True,
+                 regex_groups = {
+                             "x": "^\s*\"%s\":.*$\\n" % (script_name),
+                         },
+             )
+
+def remove_dependency(file, package_name):
+  return     core.replace(
+                 paths = glob([file]),
+                 before = "${x}",
+                 after = "",
+                 multiline = True,
+                 regex_groups = {
+                             "x": "^    \"%s\":.*$\\n" % (package_name),
+                         },
+             )
+
+def remove_trailing_commas(file):
+  return core.filter_replace(
+                             paths = glob([file]),
+                             regex = "(\"\s*,\s*)\}",
+                             group = 1,
+                             mapping = core.replace_mapper([
+                                                     core.replace(
+                                                         before = ",",
+                                                         after = ""
+                                                     ),
+                                                           ]),
+
+                          )
+
+def set_package_name_to(file, name):
+  return     core.replace(
+                 paths = glob([file]),
+                 before = "codemods\",",
+                 after = "%s\"," % (name),
+             )
+
+def replace_dependency(file, to_replace, substitute):
+  return core.replace(
+             paths = glob([file]),
+             before = "${x}",
+             after = substitute+",",
+             regex_groups = {
+                          "x": "\"%s\":.*$" % (to_replace),
+                      },
+         )
+
+transformations = [
+    set_package_name_to("package.json", "gilded-rose"),
+    remove_script("package.json", "start"),
+    remove_script("package.json", "transform"),
+    remove_script("package.json", "transform:default-imports"),
+    remove_script("package.json", "transform:default-exports"),
+    replace_dependency("package.json", "jscodeshift", '"@babel/preset-typescript": "7.9.0"'),
+    remove_dependency("package.json", "@types/jscodeshift"),
+    remove_dependency("package.json", "change-case"),
+    remove_dependency("package.json", "jest-extended"),
+    remove_trailing_commas("package.json"),
+]
+
+core.workflow(
+    name = "initial-import",
+    mode = "SQUASH",
+    origin = git.origin(
+                            url = origin_url,
+                            ref = "guilded-rose-start",
+                        ),
+    origin_files = origin_files,
+    transformations = transformations,
+    destination = destination,
+    authoring = authoring,
+)
+
+core.workflow(
+    name = "guilded-rose",
+    mode = "ITERATIVE",
+    origin = git.origin(
+                            url = origin_url,
+                            ref = "guilded-rose",
+                        ),
+    origin_files = origin_files,
+    destination_files = glob(["**"], exclude = ["yarn.lock"]),
+    transformations = transformations,
+    destination = destination,
+    authoring = authoring,
+)
