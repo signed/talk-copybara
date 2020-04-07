@@ -3,7 +3,42 @@
 :slides: .
 :imagedir: ../images
 :customcss: ../styles/custom.css
-= The Topic
+= https://github.com/google/copybara[Copybara^]
+
+[%notitle]
+== Has nothing to do with ...
+
+copybara
+ !==
+capybara
+
+=== this is a capybara
+
+image::https://upload.wikimedia.org/wikipedia/commons/e/ec/Capybara_%28Hydrochoerus_hydrochaeris%29.JPG[capybara]
+
+=== http://teamcapybara.github.io/capybara/[capybara in ruby]
+
+Library to simulate a user interacting with the browser
+
+== What is Copybara
+Copybara: A tool for transforming and moving code between repositories.
+
+=== Why did I want to use it
+
+Extract commits made in another repository
+Introduce my example
+preserver time stamp information on transformation
+
+== how to use it
+
+=== You have to build it on your own
+
+=== command line example
+
+== The configuration
+
+- quick intro to Starlark
+- also used in bazel
 
 include::{slides}/sandbox.adoc[]
 
